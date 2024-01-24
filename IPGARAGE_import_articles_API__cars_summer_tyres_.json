@@ -1,0 +1,550 @@
+{
+  "name": "IPGARAGE import articles API (cars summer tyres)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "bc0ed566-0044-4f49-a9ae-4bead7ef5aad",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.latakko.eu/Token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "password"
+            },
+            {
+              "name": "username",
+              "value": "apiIP"
+            },
+            {
+              "name": "password",
+              "value": "nZuyZsqjwq9CjA"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ef18f8d1-5409-45b7-840e-e3d7664d12fc",
+      "name": "API token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        220,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.latakko.eu/api/Articles?OnlyStockItems=True&OnlyLocalStockItems=False&IncludeCarTyres=True&IncludeMotorcycleTyres=False&IncludeTruckTyres=False&IncludeEarthmoverTyres=False&IncludeAlloyRims=False&IncludeSteelRims=False&IncludeAccessories=False&IncludeOils=False&IncludeBatteries=False",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer  {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f98f30e0-2516-4d20-a935-b5e56251f08e",
+      "name": "API Articles",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      },
+      "id": "271fe44f-eed8-441f-8213-6481d7ab2ead",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        740,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "concatenateItems",
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "649c5ff5-61eb-4c98-8b58-2557434b9de0",
+      "name": "Sagrupē sarakstu",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3.1,
+      "position": [
+        740,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {}
+      },
+      "id": "cbf95f1e-5168-427c-8d22-5f47631d4afc",
+      "name": "Binary convert",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "/home/bitnami/ipgarage/latakko_stock.json",
+        "options": {}
+      },
+      "id": "323d52ab-de7e-404f-a413-a29e00bc21f1",
+      "name": "Write Binary Stock",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Ieseivojam failu (tikai testam)",
+        "height": 258.58682634730536,
+        "width": 818.299401197605,
+        "color": 3
+      },
+      "id": "30eb63c4-1dfa-407d-a28c-66e832c0ee3a",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        632.6946107784432
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Nolasam API datus",
+        "height": 251.97604790419163,
+        "width": 511.616766467066
+      },
+      "id": "cef23117-0a1b-4e03-be1e-2e0fcfe3bf00",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "ob0vfG6o2D8tZR2K"
+      },
+      "id": "a79ce00b-a9e3-435d-8aca-7efac4a15694",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "seconds"
+      },
+      "id": "c38216bc-8617-429a-8506-f7fdef21ed8d",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        1040
+      ],
+      "webhookId": "7304b02f-0c7a-4e8f-ad3a-5523822ad649"
+    },
+    {
+      "parameters": {
+        "content": "Izsauc API importa moduli batch režīmā",
+        "height": 359.412668227316,
+        "width": 818.3707198532762,
+        "color": 5
+      },
+      "id": "1af4da88-f234-4881-84ee-d23d51d9b2d1",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 3
+            }
+          ]
+        }
+      },
+      "id": "28b7b557-795a-42e7-b5b7-4cc6fb124fb9",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.latakko.eu/api/Articles/611",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer  {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5fe192ce-8266-4e64-848d-8fc48fdc35e3",
+      "name": "API Articles1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -320,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.latakko.eu/Token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "password"
+            },
+            {
+              "name": "username",
+              "value": "apiIP"
+            },
+            {
+              "name": "password",
+              "value": "nZuyZsqjwq9CjA"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "456429cb-76ca-478d-9e1b-87ded4746ab7",
+      "name": "API token1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.latakko.eu/api/Articles/15647",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer  {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8dbe4785-aec2-488f-8986-501b5fef5dd7",
+      "name": "API Articles2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "CyDHIqh4SH3nd5xk"
+      },
+      "id": "c430a114-8dd3-4a97-8058-183170f6a303",
+      "name": "Noņemt liekos",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1320
+      ]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "cat",
+              "stringValue": "'10' , '15' , '20' , '22', '24'"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "665c130b-dfeb-46f2-98dc-ddeeb18cca2d",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        1320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c24645ce-0b18-4c49-b181-237b5aae1582",
+              "leftValue": "={{ $json.MainGroupId }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "193d0a42-ab39-4b41-aa78-6dbd63a007ea",
+              "leftValue": "={{ $json.MainGroupId }}",
+              "rightValue": 48,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c4fe22c7-88c6-4d1d-844d-3f6c982fe823",
+              "leftValue": "={{ $json.MainGroupId }}",
+              "rightValue": 13,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "4e42b095-af81-489a-8d9a-2a48285c5b8b",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        460,
+        1040
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "API token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API token": {
+      "main": [
+        [
+          {
+            "node": "API Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sagrupē sarakstu": {
+      "main": [
+        [
+          {
+            "node": "Binary convert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Binary convert": {
+      "main": [
+        [
+          {
+            "node": "Write Binary Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "API token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Articles": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API token1": {
+      "main": [
+        [
+          {
+            "node": "API Articles2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Noņemt liekos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Riga",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveExecutionProgress": true
+  },
+  "versionId": "2797db93-aad9-4a5a-8fc4-f604b1b74941",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c42b56c48399e24671b6e67e33556df9afd487de2f3bcbdf47ed080ed6976782"
+  },
+  "id": "prjmEnmpFbSTe5gB",
+  "tags": [
+    {
+      "createdAt": "2024-01-11T05:41:52.696Z",
+      "updatedAt": "2024-01-11T05:41:52.696Z",
+      "id": "cRfJkMTRJU46oymc",
+      "name": "ipgarage"
+    },
+    {
+      "createdAt": "2024-01-24T06:12:20.430Z",
+      "updatedAt": "2024-01-24T06:12:20.430Z",
+      "id": "qI5CxcAdoghBDFu0",
+      "name": "articles"
+    }
+  ]
+}
