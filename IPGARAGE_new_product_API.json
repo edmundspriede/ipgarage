@@ -1,0 +1,423 @@
+{
+  "name": "IPGARAGE new product API",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "691395f1-6c83-47c6-96e5-8e00056083ea",
+      "name": "When clicking \"Test Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.latakko.eu/api/ArticleImages/{{ $('Article').item.json.ImageId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer  {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9a8b1185-446a-45fd-b3dd-0dcf58437383",
+      "name": "HTTP Request3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        160,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.latakko.eu/Token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "password"
+            },
+            {
+              "name": "username",
+              "value": "apiIP"
+            },
+            {
+              "name": "password",
+              "value": "nZuyZsqjwq9CjA"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "05c59578-42e6-4295-be9e-fbf694ed507f",
+      "name": "token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -160,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.latakko.eu/api/Articles/{{ $('Start').item.json.body.articleid }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer  {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43aaf45e-cfc8-4853-a1ca-c15956b503d9",
+      "name": "Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        80,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "9891807e-cb37-41e5-8e38-cdb73aac7db5",
+              "leftValue": "={{ $json.ImageId }}",
+              "rightValue": "=200",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "3c6f6598-3af9-45ee-86c5-05b050252e6e",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        440,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.ipgarage.lv/wp-json/wc/v3/products/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n   \"sku\" : \"{{ $('Article').item.json.EAN }}\",\n   \"categories\" :  {{ JSON.stringify($('Code').item.json.categs) }} ,\n   \"price\" : \"{{ $('Article').item.json.RetailPrice }}\" ,\n   \"regular_price\" : \"{{ $('Article').item.json.RetailPrice }}\" ,\n   \"manage_stock\" : true,\n   \"stock_quantity\" : {{ $('Article').item.json.QuantityAvailable }} ,\n   \"weight\" :  \"{{ $('Article').item.json.Weight }}\" ,\n   \"name\" : \"{{ $('Article').item.json.ArticleText }}\",\n   \"status\" : \"publish\",\n  \n   \"attributes\" : [\n       {  \"id\": 2, \"options\" : [ \"{{ $('Article').item.json.ManufacturerArticleId }}\" ] , \"visible\" : true },\n       {  \"id\": 3, \"options\" : [ \"{{ $('Article').item.json.BrandId }}\" ] , \"visible\" : true },\n       {  \"id\": 4, \"options\" : [ \"{{ $('Article').item.json.BrandName }}\" ] , \"visible\" : true },\n       {  \"id\": 5, \"options\" : [ \"{{ $('Article').item.json.PatternModelText }}\" ] , \"visible\" : true },\n       {  \"id\": 44, \"options\" : [ \"{{ $('Article').item.json.DotYear }}\" ]  , \"visible\" : true },\n       {  \"id\": 10, \"options\" : [ \"{{ $('Article').item.json.Width }}\" ]  , \"visible\" : true },\n       {  \"id\": 11, \"options\" : [ \"{{ $('Article').item.json.AspectRatio }}\" ] , \"visible\" : true },\n       {  \"id\": 12 , \"options\" : [ \"{{ $('Article').item.json.Diameter }}\" ] , \"visible\" : true },\n       {  \"id\": 17, \"options\" : [ \"{{ $('Article').item.json.LoadIndex }}\" ] , \"visible\" : true },\n       {  \"id\": 18, \"options\" : [ \"{{ $('Article').item.json.SpeedIndex }}\" ] , \"visible\" : true },\n       {  \"id\": 20, \"options\" : [ \"{{ $('Article').item.json.WetGrip }}\" ] , \"visible\" : true },\n       {  \"id\": 25, \"options\" : [ \"{{ $('Article').item.json.SnowGrip }}\" ]  , \"visible\" : true },\n       {  \"id\": 26, \"options\" : [ \"{{ $('Article').item.json.IceGrip }}\" ] , \"visible\" : true },\n       {  \"id\": 14, \"options\" : [ \"{{ $('Article').item.json.Radial }}\" ] , \"visible\" : true }\n     ] ,\n   \"meta_data\" : [  \n       { \"key\" : \"latakko-article\" , \"value\" : \"{{ $('Article').item.json.ArticleId }}\" },\n       { \"key\":  \"_foreign_stock\" , \"value\" :  \"{{ $('Article').item.json.QuantityExternal }}\"  },\n       { \"key\":  \"latakko\" , \"value\" :  1  }\n\n    ]  ,\n\n   \"images\" : [{ \"src\" : \"https://ipgarage.lv/wp-content/images/{{ $('Article').item.json[\"EAN\"] }}.jpg\" }]\n  \n\n  \n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "56df62ff-ace8-4264-84b8-7093c194fb10",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        900
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Pahnlvvj6XlU9AMa",
+          "name": "IPGARAGE localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/bitnami/wordpress/wp-content/images/{{ $('Article').item.json.EAN }}.jpg",
+        "options": {
+          "append": false
+        }
+      },
+      "id": "3a5a4d19-f381-4ff1-bcaa-ae464eaa1b3f",
+      "name": "Read/Write Files from Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        460,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.latakko.eu/Token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "password"
+            },
+            {
+              "name": "username",
+              "value": "apiIP"
+            },
+            {
+              "name": "password",
+              "value": "nZuyZsqjwq9CjA"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "31b014b4-d136-40d3-87c3-6a56fe0ada04",
+      "name": "token1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -120,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.ipgarage.lv/wp-json/wc/v3/products/77556",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "0a2dfd1e-4ce8-45ba-9193-f379ebc92e31",
+      "name": "PUT product",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -380,
+        900
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Pahnlvvj6XlU9AMa",
+          "name": "IPGARAGE localhost"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "2bb0277e-988c-4498-acc8-29f976acb8e7",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.ipgarage.lv/wp-json/wc/v3/products/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n   \"sku\" : \"{{ $('Article').item.json.EAN }}\",\n   \"categories\" :  {{ JSON.stringify($('Start').item.json.categs) }} ,\n   \"price\" : \"{{ $('Article').item.json.RetailPrice }}\" ,\n   \"regular_price\" : \"{{ $('Article').item.json.RetailPrice }}\" ,\n   \"manage_stock\" : true,\n   \"stock_quantity\" : {{ $('Article').item.json.QuantityAvailable }} ,\n   \"weight\" :  \"{{ $('Article').item.json.Weight }}\" ,\n   \"name\" : \"{{ $('Article').item.json.ArticleText }}\",\n   \"status\" : \"publish\",\n  \n   \"attributes\" : [\n       {  \"id\": 2, \"options\" : [ \"{{ $('Article').item.json.ManufacturerArticleId }}\" ]  , \"visible\" : true },\n       {  \"id\": 3, \"options\" : [ \"{{ $('Article').item.json.BrandId }}\" ]  , \"visible\" : true },\n       {  \"id\": 4, \"options\" : [ \"{{ $('Article').item.json.BrandName }}\" ] , \"visible\" : true },\n       {  \"id\": 5, \"options\" : [ \"{{ $('Article').item.json.PatternModelText }}\" ] , \"visible\" : true },\n       {  \"id\": 44, \"options\" : [ \"{{ $('Article').item.json.DotYear }}\" ]  , \"visible\" : true },\n       {  \"id\": 10, \"options\" : [ \"{{ $('Article').item.json.Width }}\" ]  , \"visible\" : true },\n       {  \"id\": 11, \"options\" : [ \"{{ $('Article').item.json.AspectRatio }}\" ]  , \"visible\" : true },\n       {  \"id\": 12 , \"options\" : [ \"{{ $('Article').item.json.Diameter }}\" ]  , \"visible\" : true },\n       {  \"id\": 17, \"options\" : [ \"{{ $('Article').item.json.LoadIndex }}\" ]  , \"visible\" : true },\n       {  \"id\": 18, \"options\" : [ \"{{ $('Article').item.json.SpeedIndex }}\" ], \"visible\" : true },\n       {  \"id\": 20, \"options\" : [ \"{{ $('Article').item.json.WetGrip }}\" ]  , \"visible\" : true },\n       {  \"id\": 25, \"options\" : [ \"{{ $('Article').item.json.SnowGrip }}\" ] , \"visible\" : true },\n       {  \"id\": 26, \"options\" : [ \"{{ $('Article').item.json.IceGrip }}\" ] , \"visible\" : true },\n       {  \"id\": 14, \"options\" : [ \"{{ $('Article').item.json.Radial }}\" ] , \"visible\" : true }\n     ] ,\n   \"meta_data\" : [  \n       { \"key\" : \"latakko-article\" , \"value\" : \"{{ $('Article').item.json.ArticleId }}\" },\n       { \"key\":  \"_foreign_stock\" , \"value\" :  \"{{ $('Article').item.json.QuantityExternal }}\"  },\n       { \"key\":  \"latakko\" , \"value\" :  1  }\n\n    ] \n  \n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "d6fb96af-9eb5-4fe0-875a-6b135c21ec10",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        380
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Pahnlvvj6XlU9AMa",
+          "name": "IPGARAGE localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Add a new field called 'myNewField' to the JSON of the item\n\ncategs = [];\nswitch($input.item.json.MainGroupId) {\n  //vasras auto   \n  case 10 :  categs = [ { \"id\" : 17  }  , { \"id\" : 99698  }, { \"id\" : 99697  } ] ;  break;  //parastās vasaras\n  case 13:  categs = [ { \"id\" : 18  }  , { \"id\" : 99698  }, { \"id\" : 99697  } ] ;  break;   //pārstrādātas vasaras\n  case 48:  categs = [ { \"id\" : 33  }  , { \"id\" : 99698  }, { \"id\" : 99697  } ] ;  break;    //collas vasaras\n\n  //ziemas auto  \n  case 15:  categs = [ { \"id\" : 19  }  , { \"id\" : 99697  } ] ;  break;   //vissezona\n  case 20:  categs = [ { \"id\" : 20  }  , { \"id\" : 99697  } , { \"id\" : 99699}] ;  break;   //ziemas saķere vieglie\n  case 21:  categs = [ { \"id\" : 21  }  , { \"id\" : 99697  } , { \"id\" : 99699}] ;  break;   //ziemas ar radzēm vieglie  \n  case 22:  categs = [ { \"id\" : 22  }  , { \"id\" : 99697  } , { \"id\" : 99699}] ;  break;   //ziemas radžojamas vieglie     \n  case 23:  categs = [ { \"id\" : 23  }  , { \"id\" : 99697  } , { \"id\" : 99699}] ;  break;   //ziemas saķere pārstrādātas vieglie\n  case 24:  categs = [ { \"id\" : 24  }  , { \"id\" : 99697  } , { \"id\" : 99699}] ;  break;   //ziemas ar radzēm vieglie pārstrādātas\n  case 49:  categs = [ { \"id\" : 34  }  , { \"id\" : 99697  } , { \"id\" : 99699}] ;  break;   //ziemas collas vieglie\n\n  //busi\n  case 30:  categs = [ { \"id\" : 25  }  , { \"id\" : 99702  } , { \"id\" : 99701}] ;  break;   //busi parastas  \n  case 33:  categs = [ { \"id\" : 26  }  , { \"id\" : 99702  } , { \"id\" : 99701}] ;  break;   //busi parastas pārstrādātas\n  case 35:  categs = [ { \"id\" : 27  }  , { \"id\" : 99701}] ;  break;   //busi vissezonas\n  case 40:  categs = [ { \"id\" : 28  }  , { \"id\" : 99703  } , { \"id\" : 99701}] ;  break;   //busi ziemas saķeres\n  case 41:  categs = [ { \"id\" : 29  }  , { \"id\" : 99703  } , { \"id\" : 99701}] ;  break;   //busi ziemas ar radzēm\n  case 42:  categs = [ { \"id\" : 30  }  , { \"id\" : 99703  } , { \"id\" : 99701}] ;  break;   //busi ziemas radžojamas\n  case 53:  categs = [ { \"id\" : 26  }  , { \"id\" : 99701}] ;  break;   //busi pārstrādātas\n\n  //indagtruck\n  case 66:  categs = [ { \"id\" : 37  } ,  { \"id\" : 99776} ] ;  break;   //traktoru \n  case 80:  categs = [ { \"id\" : 38  }  , { \"id\" : 99776} ] ;  break;   //industriālas\n  case 88:  categs = [ { \"id\" : 40  }] ;  break;   //industriālas  \n\n  //moto  \n  case 85:  categs = [ { \"id\" : 39  }] ;  break;   \n    \n         \n         \n       \n      \n      \n\n}\n\n$input.item.json.categs = categs;\n\nreturn $input.item;"
+      },
+      "id": "15a6f670-c186-4847-9faa-3caeec9fc9ad",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        380
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Test Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "token": {
+      "main": [
+        [
+          {
+            "node": "Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "token1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "token1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "876a6cb7-3155-4dbb-a191-2caf5b82a7c8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c42b56c48399e24671b6e67e33556df9afd487de2f3bcbdf47ed080ed6976782"
+  },
+  "id": "oRAAGbhLSlNU3lTL",
+  "tags": []
+}
