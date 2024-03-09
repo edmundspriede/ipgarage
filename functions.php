@@ -1,3 +1,5 @@
+<?php
+
 function custom_action_before_add_to_cart($cartid, $product_id, $quantity, $variation_id = 0, $variation = array(), $cart_item_data = array()) {
    
 	if( $articleid = get_post_meta( $product_id, 'latakko-article', true ) ) {
