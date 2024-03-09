@@ -1,8 +1,3 @@
-<?php
-
-// Add a custom action before adding the product to the cart
-
-//EP function to check and update stock before add to cart to avoid wrong purchase
 function custom_action_before_add_to_cart($cartid, $product_id, $quantity, $variation_id = 0, $variation = array(), $cart_item_data = array()) {
    
 	if( $articleid = get_post_meta( $product_id, 'latakko-article', true ) ) {
@@ -98,9 +93,56 @@ function update_product_by_sku(WP_REST_Request $request) {
 		if ($data["latakko"])  update_post_meta($product_id, 'latakko', 1);
 			
 		//Update categories
-		if ($data["categories"]) wp_set_post_categories($product_id,$data["categories"] );
+		//
+	    // Add a new field called 'myNewField' to the JSON of the item
 
-        return new WP_REST_Response(['success' => true, "id" => $product_id], 200);
+		$categs = [];
+		switch($data["MainGroupId"]) {
+  			//vasras auto   
+  			case 10:  $categs = [  17  , 99698  , 99697   ] ;  break;  //parastās vasaras
+  			case 13:  $categs = [  18 , 99698  ,  99697   ] ;  break;   //pārstrādātas vasaras
+  			case 48:  $categs = [  33 , 99698  ,  99697   ] ;  break;    //collas vasaras
+
+  			//ziemas auto  
+  			case 15:  $categs = [  19 , 99697 ] ;  break;   //vissezona
+  			case 20:  $categs = [  20 , 99697  ,  99699 ] ;  break;   //ziemas saķere vieglie
+  			case 21:  $categs = [  21 , 99697  ,  99699 ] ;  break;   //ziemas ar radzēm vieglie  
+  			case 22:  $categs = [  22 , 99697  ,  99699 ] ;  break;   //ziemas radžojamas vieglie     
+  			case 23:  $categs = [  23 , 99697  ,  99699 ] ;  break;   //ziemas saķere pārstrādātas vieglie
+  			case 24:  $categs = [  24 , 99697  ,  99699 ] ;  break;   //ziemas ar radzēm vieglie pārstrādātas
+  			case 49:  $categs = [  34 , 99697  ,  99699 ] ;  break;   //ziemas collas vieglie
+
+  			//busi
+  			case 30:  $categs = [ 25  , 99702 , 99701 ] ;  break;   //busi parastas  
+  			case 33:  $categs = [ 26  , 99702 , 99701 ] ;  break;   //busi parastas pārstrādātas
+  			case 35:  $categs = [ 27  , 99701 ];  break;   //busi vissezonas
+  			case 40:  $categs = [ 28  , 99703 , 99701 ] ;  break;   //busi ziemas saķeres
+  			case 41:  $categs = [ 29  ,  99703 , 99701] ;  break;   //busi ziemas ar radzēm
+  			case 42:  $categs = [ 30  ,  99703 , 99701] ;  break;   //busi ziemas radžojamas
+  			
+			//kravas
+  			case 50:  $categs = [ 35 ] ;  break;   //kravas
+    
+  			//indagtruck
+  			case 66:  $categs = [ 37  ,  99776 ] ;  break;   //traktoru 
+  			case 80:  $categs = [ 38  ,  99776 ] ;  break;   //industriālas
+  			case 88:  $categs = [ 40  , 99776  ] ;  break;   //industriālas  
+
+			//moto  
+  			case 85:  $categs = [ 39 ]  ;  break;   
+    
+  			//diski
+  			case 220:  $categs = [  44  ,  99940 ] ;  break;   //lietie diski
+  			case 250:  $categs = [  45 ,   99940 ] ;  break;   //oriģinālie lietie diski   
+  			case 210:  $categs = [  41  ,  99706 ] ;  break;   //metāla diski auto  
+  			case 215:  $categs = [  42 ,   99706 ] ;  break;   //metāla diski busi       
+  			case 216:  $categs = [  43  ,  99706 ] ;  break;   //metāla diski agro    
+          
+		}
+		
+		$cats = wp_set_object_terms($product_ID, $categs, 'product_cat');
+
+        return new WP_REST_Response(['success' => true, "id" => $product_id, "cats" => $cats], 200);
     } else 
 		return new WP_REST_Response(['error' => 'Product not found', "articleid" => $data["articleid"]], 404);
 		
